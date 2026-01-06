@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Consultorio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🏥 Gestión de Consultorio</h1>
+                <p class="subtitle">Psicología</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sección de Formulario -->
+            <section class="form-section">
+                <h2>Nueva Sesión</h2>
+                
+                <!-- Selector de Paciente Frecuente -->
+                <div class="form-group">
+                    <label for="frequentPatient">O selecciona un paciente frecuente:</label>
+                    <select id="frequentPatient">
+                        <option value="">-- Nuevo Paciente --</option>
+                    </select>
+                </div>
+
+                <form id="patientForm" class="patient-form">
+                    <div class="form-group">
+                        <label for="patientName">Nombre del Paciente: <span class="required">*</span></label>
+                        <input type="text" id="patientName" placeholder="Ej: Juan Pérez" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patientEmail">Email:</label>
+                            <input type="email" id="patientEmail" placeholder="Ej: juan@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="patientPhone">Teléfono:</label>
+                            <input type="tel" id="patientPhone" placeholder="Ej: +54 9 11 1234567">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointmentDate">Fecha del Turno: <span class="required">*</span></label>
+                            <input type="date" id="appointmentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentTime">Hora del Turno: <span class="required">*</span></label>
+                            <input type="time" id="appointmentTime" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="amount">Monto a Pagar ($): <span class="required">*</span></label>
+                            <input type="number" id="amount" placeholder="Ej: 500" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentStatus">Estado de Pago: <span class="required">*</span></label>
+                            <select id="paymentStatus" required>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="pagado">Pagado</option>
+                                <option value="parcial">Pago Parcial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notas de la Sesión:</label>
+                        <textarea id="notes" placeholder="Observaciones, diagnóstico, etc..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Adjuntar Historia Clínica -->
+                    <div class="form-group">
+                        <label for="clinicalFile">Historia Clínica (Opcional):</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="clinicalFile" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                            <span id="fileName">Ningún archivo seleccionado</span>
+                        </div>
+                        <small>Formatos: PDF, DOC, DOCX, TXT, JPG, PNG</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Registrar Sesión</button>
+                </form>
+            </section>
+
+            <!-- Sección de Sesiones y Estadísticas -->
+            <section class="patients-section">
+                <div class="section-header">
+                    <div class="header-title-section">
+                        <h2>Sesiones Registradas</h2>
+                        <div class="stats-summary">
+                            <div class="stat-box">
+                                <span class="stat-label">Total Este Mes</span>
+                                <span class="stat-value" id="monthlyTotal">$0.00</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Pagado</span>
+                                <span class="stat-value stat-paid" id="monthlyPaid">$0.00</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Pendiente</span>
+                                <span class="stat-value stat-pending" id="monthlyPending">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="Buscar paciente...">
+                    </div>
+                </div>
+
+                <div id="loadingSpinner" class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando datos...</p>
+                </div>
+
+                <div id="patientsList" class="patients-list">
+                    <!-- Las sesiones se cargarán aquí -->
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <p>No hay sesiones registradas aún</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para editar paciente -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Paciente</h2>
+            <form id="editForm" class="patient-form">
+                <input type="hidden" id="editPatientId">
+                
+                <div class="form-group">
+                    <label for="editPatientName">Nombre del Paciente:</label>
+                    <input type="text" id="editPatientName" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPatientEmail">Email:</label>
+                        <input type="email" id="editPatientEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPatientPhone">Teléfono:</label>
+                        <input type="tel" id="editPatientPhone">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editAppointmentDate">Fecha del Turno:</label>
+                        <input type="date" id="editAppointmentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAppointmentTime">Hora del Turno:</label>
+                        <input type="time" id="editAppointmentTime" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editAmount">Monto a Pagar ($):</label>
+                        <input type="number" id="editAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPaymentStatus">Estado de Pago:</label>
+                        <select id="editPaymentStatus" required>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="pagado">Pagado</option>
+                            <option value="parcial">Pago Parcial</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editNotes">Notas:</label>
+                    <textarea id="editNotes" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editClinicalFile">Historia Clínica:</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="editClinicalFile" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                        <span id="editFileName">Ningún archivo seleccionado</span>
+                    </div>
+                    <small id="currentFileInfo"></small>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar historia clínica -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" id="viewModalClose">&times;</span>
+            <h2>Historia Clínica</h2>
+            <div id="viewModalContent" style="margin-top: 20px;">
+                <!-- Contenido se cargará aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
